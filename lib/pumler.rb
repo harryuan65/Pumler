@@ -7,7 +7,16 @@ require_relative "pumler/generator"
 module Pumler
   class Error < StandardError; end
 
-  def pick_model_base
-    Gem::Version.new(Rails.version) > Gem::Version.new("5.0.0") ? ApplicationRecord : ActiveRecord::Base
+  # Root
+  class Performer
+    class << self
+      def pick_model_base
+        Gem::Version.new(Rails.version) > Gem::Version.new("5.0.0") ? ApplicationRecord : ActiveRecord::Base
+      end
+
+      def generate!
+        Generator.new(pick_model_base, {}).generate!
+      end
+    end
   end
 end
