@@ -1,4 +1,4 @@
-require_relative "model_info"
+require_relative "entity_builder"
 
 module Pumler
   # Generates puml file base on provided target model base (ApplicationRecord or ActiveRecord::Base)
@@ -13,8 +13,8 @@ module Pumler
       @models ||= @model_base.descendants
     end
 
-    def models_info
-      @models_info ||= models.map { |model| ModelInfo.new(model, @options) }
+    def entities
+      @entities ||= models.map { |model| EntityBuilder.new(model, @model_base, @options) }
     end
 
     def ermodels
@@ -24,8 +24,8 @@ module Pumler
         skinparam backgroundColor #fffffe
         skinparam linetype polyline
         left to right direction
-        #{models_info.map(&:generate_entity).join("")}
-        #{models_info.map(&:generate_association_string).join("")}
+        #{entities.map(&:generate_entity).join("")}
+        #{entities.map(&:generate_association_string).join("")}
         @enduml
       DOC
     end
