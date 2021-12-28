@@ -1,15 +1,16 @@
 require_relative "model_info"
 
 module Pumler
+  # Generates puml file base on provided target model base (ApplicationRecord or ActiveRecord::Base)
+  # Maps all the models into ModelInfo, which contains all the information of the model.
   class Generator
     def initialize(target_model_base, options = {})
       @options = options
       @model_base = target_model_base
-      @exclude_models = @options[:exclude_models] || []
     end
 
     def models
-      @models ||= @model_base.descendants - @exclude_models
+      @models ||= @model_base.descendants
     end
 
     def models_info
