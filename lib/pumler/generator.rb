@@ -1,4 +1,6 @@
-require_relative "entity_builder"
+require_relative "builders/entity"
+require_relative "builders/polymorphic_entities"
+require_relative "builders/associations"
 
 module Pumler
   # Generates puml file base on provided target model base (ApplicationRecord or ActiveRecord::Base)
@@ -14,7 +16,15 @@ module Pumler
     end
 
     def entities
-      @entities ||= models.map { |model| EntityBuilder.new(model, @model_base, @options) }
+      @entities ||= models.map { |model| Builders::Entity.new(model, @model_base, @options) }
+    end
+
+    def polymorphic_entities
+      @polymorphic_entities ||= models.map { |model| Builders::PolymorphicEntities.new(model) }
+    end
+
+    def associations_string
+      models.map { |model| Builders::Associations.new(model).generate_segment }.join
     end
 
     def ermodels
@@ -24,8 +34,10 @@ module Pumler
         skinparam backgroundColor #fffffe
         skinparam linetype polyline
         left to right direction
-        #{entities.map(&:generate_entity).join("")}
-        #{entities.map(&:generate_association_string).join("")}
+
+        #{polymorphic_entities.map(&:generate_segment).join}
+        #{entities.map(&:generate_entity).join}
+        #{associations_string}
         @enduml
       DOC
     end
