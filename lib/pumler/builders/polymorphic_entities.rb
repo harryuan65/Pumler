@@ -11,6 +11,8 @@ module Pumler
         polymorphic_reflections.map do |association_name, _reflection|
           <<~DOC
             interface #{association_name.classify} {
+              #{association_name}_id
+              #{association_name}_type
             }
           DOC
         end.join

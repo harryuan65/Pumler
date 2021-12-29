@@ -63,15 +63,23 @@ module Pumler
       def build_association(association_name, relationship)
         macro = build_macro(relationship)
         foreign_key = relationship[:foreign_key]
+        interface = relationship[:options][:as]
 
-        case relationship[:macro]
-        when :has_many, :has_one
-          # "#{@name}--->#{association_name}::#{foreign_key}: #{macro} \n"
+        if interface
+          interface = interface.to_s.singularize.classify
+          <<~DOC
+            #{@name}--->#{interface}: #{macro} (#{foreign_key})
+            #{interface}--->#{association_name}: **polymorphic**\n
+          DOC
+        else
           "#{@name}--->#{association_name}: #{macro} (#{foreign_key}) \n"
-        when :belongs_to
-          # "#{@name}::#{foreign_key}--->#{association_name}: #{macro} \n"
-          "#{@name}--->#{association_name}: #{macro} (#{foreign_key})>\n"
         end
+
+        # case relationship[:macro]
+        # when :has_many, :has_one
+        # when :belongs_to
+        #   "#{@name}--->#{association_name}: #{macro} (#{foreign_key})>\n"
+        # end
       end
     end
   end
